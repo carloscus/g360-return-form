@@ -7,18 +7,18 @@
 	export let product = null;
 	export let isOpen = false;
 
-	let cantidad = 1;
+	let cantidad = '1';
 	let observacion = '';
 	let foto = null;
 	let cantidadInput;
 
 	$: if (product) {
-		cantidad = 1;
+		cantidad = '1';
 		observacion = '';
 		foto = null;
 	}
 
-	$: isValid = cantidad > 0 && observacion.trim().length > 0;
+	$: isValid = parseInt(cantidad) > 0 && observacion.trim().length > 0;
 
 	function close() {
 		isOpen = false;
@@ -63,7 +63,7 @@
 
 		dispatch('confirm', {
 			product,
-			cantidad: parseFloat(cantidad),
+			cantidad: parseInt(cantidad) || 1,
 			observacion: observacion.trim(),
 			foto
 		});
@@ -121,25 +121,24 @@
 					<div class="flex items-center gap-2">
 						<button
 							type="button"
-							on:click={() => cantidad = Math.max(1, cantidad - 1)}
+							on:click={() => cantidad = String(Math.max(1, (parseInt(cantidad) || 1) - 1))}
 							class="w-12 h-12 flex items-center justify-center rounded-xl bg-g360-bg dark:bg-white/10 text-g360-text dark:text-g360-textDark active:bg-g360-bg/80 dark:active:bg-white/15 active:scale-95 transition-all font-bold text-xl touch-target"
 						>
 							−
 						</button>
 						<input
 							id="quick-cantidad"
-							type="number"
+							type="text"
+							inputmode="numeric"
+							pattern="[0-9]*"
 							bind:this={cantidadInput}
 							bind:value={cantidad}
 							on:focus={selectAll}
 							class="flex-1 h-12 px-3 text-center border border-g360-surface/50 dark:border-white/10 rounded-xl bg-white/60 dark:bg-white/5 text-g360-text dark:text-g360-textDark text-xl font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/50"
-							min="1"
-							step="1"
-							inputmode="numeric"
 						/>
 						<button
 							type="button"
-							on:click={() => cantidad = cantidad + 1}
+							on:click={() => cantidad = String((parseInt(cantidad) || 0) + 1)}
 							class="w-12 h-12 flex items-center justify-center rounded-xl bg-g360-bg dark:bg-white/10 text-g360-text dark:text-g360-textDark active:bg-g360-bg/80 dark:active:bg-white/15 active:scale-95 transition-all font-bold text-xl touch-target"
 						>
 							+
