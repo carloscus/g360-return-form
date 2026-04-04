@@ -10,18 +10,24 @@
 	let cantidad = 1;
 	let observacion = '';
 	let foto = null;
+	let cantidadInput;
 
-	$: isValid = cantidad > 0 && observacion.trim().length > 0;
-
-	function open() {
+	$: if (product) {
 		cantidad = 1;
 		observacion = '';
 		foto = null;
-		isOpen = true;
 	}
+
+	$: isValid = cantidad > 0 && observacion.trim().length > 0;
 
 	function close() {
 		isOpen = false;
+	}
+
+	function selectAll() {
+		if (cantidadInput) {
+			cantidadInput.select();
+		}
 	}
 
 	function handlePhotoCapture(e) {
@@ -123,7 +129,9 @@
 						<input
 							id="quick-cantidad"
 							type="number"
+							bind:this={cantidadInput}
 							bind:value={cantidad}
+							on:focus={selectAll}
 							class="flex-1 h-12 px-3 text-center border border-g360-surface/50 dark:border-white/10 rounded-xl bg-white/60 dark:bg-white/5 text-g360-text dark:text-g360-textDark text-xl font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/50"
 							min="1"
 							step="1"
