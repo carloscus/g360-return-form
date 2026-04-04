@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import {
 		clientData,
 		returnLines,
@@ -202,7 +203,7 @@
 							</svg>
 						</button>
 					{/if}
-					<img src="/logo-cipsa.svg" alt="CIPSA" class="h-8 sm:h-10 w-auto" />
+					<img src="{base}/logo-cipsa.svg" alt="CIPSA" class="h-8 sm:h-10 w-auto" />
 					<div>
 						<h1 class="text-base sm:text-lg font-bold text-g360-text dark:text-g360-textDark">
 							{editingLine ? 'Editar Línea' : 'CIPSA Devolución de Productos'}

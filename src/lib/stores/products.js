@@ -1,10 +1,11 @@
 import { writable } from 'svelte/store';
+import { base } from '$app/paths';
 
 export const productos = writable([]);
 
 export async function loadProductos() {
 	try {
-		const response = await fetch('/catalogo_productos.json');
+		const response = await fetch(`${base}/catalogo_productos.json`);
 		if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 		const catalog = await response.json();
 		const rawProductos = catalog.productos || [];
