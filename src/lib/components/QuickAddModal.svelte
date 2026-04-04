@@ -11,11 +11,17 @@
 	let observacion = '';
 	let foto = null;
 	let cantidadInput;
+	let initialized = false;
 
-	$: if (product) {
+	$: if (product && isOpen && !initialized) {
 		cantidad = 1;
 		observacion = '';
 		foto = null;
+		initialized = true;
+	}
+
+	$: if (!isOpen) {
+		initialized = false;
 	}
 
 	$: isValid = cantidad > 0 && observacion.trim().length > 0;
