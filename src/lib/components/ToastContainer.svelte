@@ -14,7 +14,9 @@
 		<div
 			class="toast toast-{toast.type} pointer-events-auto cursor-pointer w-full text-left"
 			on:click={() => removeToast(toast.id)}
-			role="status"
+			on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeToast(toast.id); } }}
+			tabindex="0"
+			role={toast.type === 'error' ? 'alert' : 'status'}
 		>
 			<div class="flex items-start gap-3">
 				<svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">

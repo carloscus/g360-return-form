@@ -116,7 +116,8 @@
 					</div>
 					<button
 						on:click={close}
-						class="p-2 text-g360-muted hover:text-g360-text dark:hover:text-g360-textDark hover:bg-g360-bg dark:hover:bg-white/10 rounded-xl transition-all flex-shrink-0"
+						class="p-2 text-g360-muted hover:text-g360-text dark:hover:text-g360-textDark hover:bg-g360-bg dark:hover:bg-white/10 rounded-xl transition-all flex-shrink-0 touch-target"
+						aria-label="Cerrar"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -132,6 +133,7 @@
 							type="button"
 							on:click={() => cantidad = Math.max(1, cantidad - 1)}
 							class="w-12 h-12 flex items-center justify-center rounded-xl bg-g360-bg dark:bg-white/10 text-g360-text dark:text-g360-textDark active:bg-g360-bg/80 dark:active:bg-white/15 active:scale-95 transition-all font-bold text-xl touch-target"
+							aria-label="Reducir cantidad"
 						>
 							−
 						</button>

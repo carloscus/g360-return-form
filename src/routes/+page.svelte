@@ -272,22 +272,11 @@
 	{/if}
 
 
-	{#if showManualModal}
-		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
-			on:click={(e) => e.target === e.currentTarget && (showManualModal = false)}
-			on:keydown={(e) => e.key === 'Escape' && (showManualModal = false)}
-			role="dialog"
-			aria-modal="true"
-		>
-			<div on:click|stopPropagation on:touchstart|stopPropagation>
-			<ManualProductModal
-				initialCodigo={manualModalCodigo}
-				on:add={handleAddManualProduct}
-			/>
-			</div>
-		</div>
-	{/if}
+	<ManualProductModal
+		bind:isOpen={showManualModal}
+		initialCodigo={manualModalCodigo}
+		on:add={handleAddManualProduct}
+	/>
 
 	<QuickAddModal
 		bind:product={quickAddProduct}

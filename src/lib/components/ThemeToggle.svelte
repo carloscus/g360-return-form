@@ -1,17 +1,5 @@
 <script>
-	import { onMount } from 'svelte';
-
-	let isDark = false;
-
-	onMount(() => {
-		const savedTheme = localStorage.getItem('theme');
-		if (savedTheme === 'dark') {
-			isDark = true;
-			document.documentElement.classList.add('dark');
-		} else {
-			document.documentElement.classList.remove('dark');
-		}
-	});
+	let isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
 
 	function toggleTheme() {
 		isDark = !isDark;
@@ -27,8 +15,8 @@
 
 <button
 	on:click={toggleTheme}
-	class="p-2 rounded-xl hover:bg-g360-bg dark:hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-	title={isDark ? 'Modo claro' : 'Modo oscuro'}
+	class="p-2 rounded-xl hover:bg-g360-bg dark:hover:bg-white/10 transition-colors touch-target flex items-center justify-center"
+	aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
 >
 	{#if isDark}
 		<svg class="w-5 h-5 text-warning-400" fill="currentColor" viewBox="0 0 20 20">

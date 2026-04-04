@@ -65,7 +65,7 @@
 					inputmode="numeric"
 				/>
 				{#if ruc.length > 0}
-					<span class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter text-white transition-all duration-300 {ruc.length === 11 ? 'bg-rose-500 shadow-sm shadow-rose-500/20' : 'bg-[var(--g360-accent)] shadow-sm shadow-[var(--g360-accent)]/20'}">
+					<span class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-tighter text-white transition-all duration-300 {ruc.length === 11 ? 'bg-rose-500 shadow-sm shadow-rose-500/20' : 'bg-primary-500 shadow-sm shadow-primary-500/20'}">
 						{ruc.length === 11 ? 'RUC' : 'DNI'}
 					</span>
 				{/if}

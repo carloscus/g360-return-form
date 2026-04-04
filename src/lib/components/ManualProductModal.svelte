@@ -4,16 +4,24 @@
 	const dispatch = createEventDispatcher();
 
 	export let initialCodigo = '';
+	export let isOpen = false;
 
 	let codigo = '';
 	let nombre = '';
 	let ean = '';
 	let precio = '';
 	let observacion = '';
-	let visible = false;
 
-	$: if (visible) {
+	$: if (isOpen) {
 		codigo = initialCodigo;
+		nombre = '';
+		ean = '';
+		precio = '';
+		observacion = '';
+	}
+
+	function close() {
+		isOpen = false;
 	}
 
 	function confirm() {
@@ -28,23 +36,29 @@
 			observacion: observacion.trim()
 		});
 
-		visible = false;
+		close();
 	}
 
 	function handleClickOutside(e) {
-		if (e.target === e.currentTarget) {
-			visible = false;
+		if (e.target === e.currentTarget) close();
+	}
+
+	function handleKeydown(e) {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			close();
 		}
 	}
 </script>
 
-{#if visible}
+{#if isOpen}
 	<div
 		class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
 		on:click={handleClickOutside}
-		on:keydown={(e) => e.key === 'Escape' && (visible = false)}
+		on:keydown={handleKeydown}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 	>
 		<div
 			class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto"
@@ -57,8 +71,9 @@
 						Agregar Producto Manual
 					</h3>
 					<button
-						on:click={() => visible = false}
-						class="p-2 text-g360-muted hover:text-g360-text dark:hover:text-g360-textDark hover:bg-g360-bg dark:hover:bg-white/10 rounded-xl transition-all"
+						on:click={close}
+						class="p-2 text-g360-muted hover:text-g360-text dark:hover:text-g360-textDark hover:bg-g360-bg dark:hover:bg-white/10 rounded-xl transition-all touch-target"
+						aria-label="Cerrar"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -76,6 +91,7 @@
 							bind:value={codigo}
 							class="glass-input"
 							placeholder="SKU del producto"
+							aria-required="true"
 						/>
 					</div>
 					<div class="input-group">
@@ -88,11 +104,12 @@
 							bind:value={nombre}
 							class="glass-input"
 							placeholder="Descripción del producto"
+							aria-required="true"
 						/>
 					</div>
 					<div class="input-group">
 						<label for="manual-ean" class="input-label">
-							EAN <span class="text-slate-400 font-normal">(opcional)</span>
+							EAN <span class="text-g360-muted dark:text-g360-mutedDark font-normal">(opcional)</span>
 						</label>
 						<input
 							id="manual-ean"
@@ -126,12 +143,13 @@
 							class="glass-input resize-none"
 							rows="3"
 							placeholder="Motivo de devolución..."
+							aria-required="true"
 						></textarea>
 					</div>
 				</div>
 				<div class="flex gap-3 justify-end mt-6">
 					<button
-						on:click={() => visible = false}
+						on:click={close}
 						class="btn-secondary"
 					>
 						Cancelar
@@ -139,7 +157,7 @@
 					<button
 						on:click={confirm}
 						disabled={!codigo.trim() || !nombre.trim()}
-						class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+						class="btn-success disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
