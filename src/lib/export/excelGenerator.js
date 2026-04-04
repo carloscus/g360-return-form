@@ -119,21 +119,31 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 
 		row.getCell(6).numFmt = '#,##0.00';
 		row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
-		row.getCell(7).numFmt = '#,##0.000';
+		row.getCell(7).numFmt = '#,##0.00';
 		row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
 		row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
 		row.getCell(9).alignment = { vertical: 'middle', wrapText: true };
 		row.getCell(10).alignment = { horizontal: 'center', vertical: 'middle' };
 
-		// Row height
-		row.height = line.foto ? 80 : 28;
-
-		// Embed photo in column J
+		// Embed photo in column J with aspect ratio
 		if (line.foto) {
 			try {
 				const ext = getExtension(line.foto);
 				const buffer = b64ToBuffer(line.foto);
 				const currentRow = detalleSheet.rowCount;
+
+				// Get image dimensions
+				const img = new Image();
+				img.src = line.foto;
+				const imgWidth = img.naturalWidth || 400;
+				const imgHeight = img.naturalHeight || 300;
+				const ratio = imgHeight / imgWidth;
+
+				const cellWidthPx = 110;
+				const cellHeightPx = Math.round(cellWidthPx * ratio);
+				const rowHeightNeeded = Math.max(cellHeightPx, 60);
+
+				row.height = rowHeightNeeded * 0.75;
 
 				const imageId = workbook.addImage({
 					buffer,
@@ -142,13 +152,16 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 				});
 
 				detalleSheet.addImage(imageId, {
-					tl: { col: 9.1, row: currentRow - 0.9 },
-					br: { col: 9.9, row: currentRow + 0.1 },
+					tl: { col: 9.1, row: currentRow - 0.85 },
+					br: { col: 9.95, row: currentRow + 0.15 },
 					editAs: 'oneCell'
 				});
 			} catch (err) {
 				console.error(`Error adding image for ${line.codigo}:`, err);
+				row.height = 28;
 			}
+		} else {
+			row.height = 28;
 		}
 	}
 
@@ -164,7 +177,7 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 	totalRow.getCell(5).alignment = { horizontal: 'right' };
 	totalRow.getCell(6).numFmt = '#,##0.00';
 	totalRow.getCell(6).alignment = { horizontal: 'center' };
-	totalRow.getCell(7).numFmt = '#,##0.000';
+	totalRow.getCell(7).numFmt = '#,##0.00';
 
 	autoFitColumns(detalleSheet, {
 		0: 5, 1: 10, 2: 14, 3: 15, 4: 35,
@@ -245,7 +258,7 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 
 		row.getCell(5).numFmt = '#,##0.00';
 		row.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
-		row.getCell(6).numFmt = '#,##0.000';
+		row.getCell(6).numFmt = '#,##0.00';
 		row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
 		row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -263,7 +276,7 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 	resTotalRow.getCell(4).alignment = { horizontal: 'right' };
 	resTotalRow.getCell(5).numFmt = '#,##0.00';
 	resTotalRow.getCell(5).alignment = { horizontal: 'center' };
-	resTotalRow.getCell(6).numFmt = '#,##0.000';
+	resTotalRow.getCell(6).numFmt = '#,##0.00';
 
 	autoFitColumns(resumenSheet, {
 		0: 10, 1: 14, 2: 15, 3: 35,
