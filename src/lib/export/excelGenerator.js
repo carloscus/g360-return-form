@@ -1,3 +1,19 @@
+function b64ToBuffer(base64) {
+	const parts = base64.split(',');
+	const data = parts.length > 1 ? parts[1] : base64;
+	const bstr = atob(data);
+	const bytes = new Uint8Array(bstr.length);
+	for (let i = 0; i < bstr.length; i++) {
+		bytes[i] = bstr.charCodeAt(i);
+	}
+	return bytes;
+}
+
+function getExtension(base64) {
+	const match = base64.match(/^data:image\/(\w+);/);
+	return match ? match[1] : 'png';
+}
+
 function autoFitColumns(worksheet, colCaps = {}) {
 	worksheet.columns.forEach((col, colIdx) => {
 		let maxLen = 6;
@@ -74,43 +90,67 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 
 	// Data rows
 	for (let i = 0; i < returnLines.length; i++) {
-			const line = returnLines[i];
-			const peso = (line.cantidad || 0) * (line.peso_kg || 0);
-			const cajas = line.un_bx > 0 ? Math.ceil((line.cantidad || 0) / line.un_bx) : 0;
+		const line = returnLines[i];
+		const peso = (line.cantidad || 0) * (line.peso_kg || 0);
+		const cajas = line.un_bx > 0 ? Math.ceil((line.cantidad || 0) / line.un_bx) : 0;
 
-			const row = detalleSheet.addRow([
-				i + 1,
-				line.codigoAlmacen || 'VES',
-				line.codigo,
-				line.ean || '',
-				line.nombre_corto || line.nombre || '',
-				line.cantidad || 0,
-				parseFloat(peso.toFixed(3)),
-				cajas,
-				line.observacion || '',
-				line.foto || ''
-			]);
+		const row = detalleSheet.addRow([
+			i + 1,
+			line.codigoAlmacen || 'VES',
+			line.codigo,
+			line.ean || '',
+			line.nombre_corto || line.nombre || '',
+			line.cantidad || 0,
+			parseFloat(peso.toFixed(3)),
+			cajas,
+			line.observacion || '',
+			line.foto ? '📷' : ''
+		]);
 
-			// Vertical center + banding
+		// Vertical center + banding
+		row.eachCell(cell => {
+			cell.alignment = { vertical: 'middle', wrapText: true };
+		});
+		if (i % 2 === 1) {
 			row.eachCell(cell => {
-				cell.alignment = { vertical: 'middle', wrapText: true };
+				cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F7F4' } };
 			});
-			if (i % 2 === 1) {
-				row.eachCell(cell => {
-					cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F7F4' } };
-				});
-			}
-
-			row.getCell(6).numFmt = '#,##0.00';
-			row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
-			row.getCell(7).numFmt = '#,##0.000';
-			row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
-			row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
-			row.getCell(9).alignment = { vertical: 'middle', wrapText: true };
-			row.getCell(10).alignment = { vertical: 'middle', wrapText: true };
-
-			row.height = line.foto ? 60 : 28;
 		}
+
+		row.getCell(6).numFmt = '#,##0.00';
+		row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
+		row.getCell(7).numFmt = '#,##0.000';
+		row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
+		row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
+		row.getCell(9).alignment = { vertical: 'middle', wrapText: true };
+		row.getCell(10).alignment = { horizontal: 'center', vertical: 'middle' };
+
+		// Row height
+		row.height = line.foto ? 80 : 28;
+
+		// Embed photo in column J
+		if (line.foto) {
+			try {
+				const ext = getExtension(line.foto);
+				const buffer = b64ToBuffer(line.foto);
+				const currentRow = detalleSheet.rowCount;
+
+				const imageId = workbook.addImage({
+					buffer,
+					extension: ext,
+					name: `evidencia_${line.codigo}_${i + 1}`
+				});
+
+				detalleSheet.addImage(imageId, {
+					tl: { col: 9.1, row: currentRow - 0.9 },
+					br: { col: 9.9, row: currentRow + 0.1 },
+					editAs: 'oneCell'
+				});
+			} catch (err) {
+				console.error(`Error adding image for ${line.codigo}:`, err);
+			}
+		}
+	}
 
 	// Totals row
 	const totalRow = detalleSheet.addRow([
@@ -128,7 +168,7 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 
 	autoFitColumns(detalleSheet, {
 		0: 5, 1: 10, 2: 14, 3: 15, 4: 35,
-		5: 10, 6: 12, 7: 12, 8: 40, 9: 8
+		5: 10, 6: 12, 7: 12, 8: 40, 9: 16
 	});
 
 	detalleSheet.views = [{ state: 'frozen', ySplit: detHeaderRow.number }];
