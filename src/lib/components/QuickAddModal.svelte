@@ -87,9 +87,12 @@
 		on:keydown={handleKeydown}
 		role="dialog"
 		aria-modal="true"
-		tabindex="-1"
 	>
-		<div class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto">
+		<div
+			class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto"
+			on:click|stopPropagation
+			on:touchstart|stopPropagation
+		>
 			<div class="p-5 sm:p-6">
 				<!-- Product header -->
 				<div class="flex items-start justify-between mb-4">

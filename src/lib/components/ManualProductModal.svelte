@@ -45,9 +45,12 @@
 		on:keydown={(e) => e.key === 'Escape' && (visible = false)}
 		role="dialog"
 		aria-modal="true"
-		tabindex="-1"
 	>
-		<div class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto">
+		<div
+			class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto"
+			on:click|stopPropagation
+			on:touchstart|stopPropagation
+		>
 			<div class="p-5 sm:p-6">
 				<div class="flex items-center justify-between mb-5">
 					<h3 class="text-lg font-bold text-g360-text dark:text-g360-textDark">

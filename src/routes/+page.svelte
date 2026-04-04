@@ -279,12 +279,13 @@
 			on:keydown={(e) => e.key === 'Escape' && (showManualModal = false)}
 			role="dialog"
 			aria-modal="true"
-			tabindex="-1"
 		>
+			<div on:click|stopPropagation on:touchstart|stopPropagation>
 			<ManualProductModal
 				initialCodigo={manualModalCodigo}
 				on:add={handleAddManualProduct}
 			/>
+			</div>
 		</div>
 	{/if}
 
