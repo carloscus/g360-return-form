@@ -20,6 +20,11 @@
 
 	$: isValid = parseInt(cantidad) > 0 && observacion.trim().length > 0;
 
+	function onCantidadInput(e) {
+		const val = e.target.value.replace(/\D/g, '');
+		cantidad = val === '' ? '' : val;
+	}
+
 	function close() {
 		isOpen = false;
 	}
@@ -121,7 +126,7 @@
 					<div class="flex items-center gap-2">
 						<button
 							type="button"
-							on:click={() => cantidad = String(Math.max(1, (parseInt(cantidad) || 1) - 1))}
+							on:click={() => { const n = parseInt(cantidad) || 0; cantidad = Math.max(1, n - 1).toString(); }}
 							class="w-12 h-12 flex items-center justify-center rounded-xl bg-g360-bg dark:bg-white/10 text-g360-text dark:text-g360-textDark active:bg-g360-bg/80 dark:active:bg-white/15 active:scale-95 transition-all font-bold text-xl touch-target"
 						>
 							−
@@ -133,12 +138,13 @@
 							pattern="[0-9]*"
 							bind:this={cantidadInput}
 							bind:value={cantidad}
+							on:input={onCantidadInput}
 							on:focus={selectAll}
 							class="flex-1 h-12 px-3 text-center border border-g360-surface/50 dark:border-white/10 rounded-xl bg-white/60 dark:bg-white/5 text-g360-text dark:text-g360-textDark text-xl font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/50"
 						/>
 						<button
 							type="button"
-							on:click={() => cantidad = String((parseInt(cantidad) || 0) + 1)}
+							on:click={() => { const n = parseInt(cantidad) || 0; cantidad = (n + 1).toString(); }}
 							class="w-12 h-12 flex items-center justify-center rounded-xl bg-g360-bg dark:bg-white/10 text-g360-text dark:text-g360-textDark active:bg-g360-bg/80 dark:active:bg-white/15 active:scale-95 transition-all font-bold text-xl touch-target"
 						>
 							+
