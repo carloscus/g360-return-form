@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="theme-color" content="#008f5d" />
+		<link rel="icon" href="/g360-return-form/favicon.svg" />
+		<script>
+			(function() {
+				var theme = localStorage.getItem('theme');
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
+			})();
+		</script>
+		<link href="/g360-return-form/_app/immutable/entry/start.Cidv3bnc.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/Wds6_iGf.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/CpDNwwCY.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/entry/app.D1FDQ20n.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/C1FmrZbK.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/29hymN_Q.js" rel="modulepreload">
+		
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div class="contents">
+			<script>
+				{
+					__sveltekit_1dmhr94 = {
+						base: "/g360-return-form",
+						assets: "/g360-return-form"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/g360-return-form/_app/immutable/entry/start.Cidv3bnc.js"),
+						import("/g360-return-form/_app/immutable/entry/app.D1FDQ20n.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
