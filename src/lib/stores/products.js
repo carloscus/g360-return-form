@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
 
 export const productos = writable([]);
-export const productCount = writable(0);
 
 export async function loadProductos() {
 	try {
@@ -31,7 +30,6 @@ export async function loadProductos() {
 		}));
 
 		productos.set(normalized);
-		productCount.set(normalized.length);
 		return normalized;
 	} catch (err) {
 		console.error('Error cargando catálogo:', err);

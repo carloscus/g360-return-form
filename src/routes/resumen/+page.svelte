@@ -31,24 +31,21 @@
 
 	$: if ($returnLines) autoSave();
 
-	$: lines = $returnLines;
-	$: client = $clientData;
-
-	$: uniqueSkuCount = [...new Set(lines.map(l => l.codigo))].length;
-	$: uniqueLineas = [...new Set(lines.filter(l => l.linea).map(l => l.linea))].length;
-	$: totalUnits = lines.reduce((s, l) => s + (l.cantidad || 0), 0);
-	$: totalCategories = [...new Set(lines.filter(l => l.categoria).map(l => l.categoria))].length;
-	$: totalWeight = lines.reduce((s, l) => s + ((l.cantidad || 0) * (l.peso_kg || 0)), 0);
-	$: totalBoxes = lines.reduce((s, l) => {
+	$: uniqueSkuCount = [...new Set($returnLines.map(l => l.codigo))].length;
+	$: uniqueLineas = [...new Set($returnLines.filter(l => l.linea).map(l => l.linea))].length;
+	$: totalUnits = $returnLines.reduce((s, l) => s + (l.cantidad || 0), 0);
+	$: totalWeight = $returnLines.reduce((s, l) => s + ((l.cantidad || 0) * (l.peso_kg || 0)), 0);
+	$: totalBoxes = $returnLines.reduce((s, l) => {
 		const un_bx = l.un_bx || 1;
 		return s + Math.ceil((l.cantidad || 0) / un_bx);
 	}, 0);
 
-	$: categories = [...new Set(lines.filter(l => l.categoria).map(l => l.categoria))];
+	$: categories = [...new Set($returnLines.filter(l => l.categoria).map(l => l.categoria))];
+	$: totalCategories = categories.length;
 
 	$: skuSummary = (() => {
 		const map = {};
-		lines.forEach(l => {
+		$returnLines.forEach(l => {
 			if (!map[l.codigo]) {
 				map[l.codigo] = {
 					codigo: l.codigo,
@@ -71,12 +68,12 @@
 	})();
 
 	async function handleExport() {
-		if (lines.length === 0) {
+		if ($returnLines.length === 0) {
 			warning('No hay líneas de devolución');
 			return;
 		}
 
-		const linesWithoutObs = lines.filter(l => !l.observacion.trim());
+		const linesWithoutObs = $returnLines.filter(l => !l.observacion.trim());
 		if (linesWithoutObs.length > 0) {
 			warning(`${linesWithoutObs.length} línea(s) sin observación`);
 			return;
@@ -85,8 +82,8 @@
 		isExporting = true;
 
 		try {
-			await generateDevolucionExcel(client, lines);
-			success(`Excel exportado: ${lines.length} línea(s), ${uniqueSkuCount} SKU(s)`);
+			await generateDevolucionExcel($clientData, $returnLines);
+			success(`Excel exportado: ${$returnLines.length} línea(s), ${uniqueSkuCount} SKU(s)`);
 		} catch (err) {
 			console.error(err);
 			error('Error al generar el Excel');
@@ -251,9 +248,9 @@
 			<!-- Lines list with edit buttons -->
 			<div class="space-y-2 mb-4 animate-fadeIn">
 				<h2 class="text-sm font-semibold text-g360-text dark:text-g360-textDark">
-					{uniqueSkuCount} SKU · {lines.length} registro{lines.length !== 1 ? 's' : ''}
+					{uniqueSkuCount} SKU · {$returnLines.length} registro{$returnLines.length !== 1 ? 's' : ''}
 				</h2>
-				{#each lines as line (line.id)}
+				{#each $returnLines as line (line.id)}
 					<div class="glass-card p-3 flex items-center gap-3">
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2">
@@ -310,7 +307,7 @@
 				</button>
 				<button
 					on:click={handleExport}
-					disabled={lines.length === 0 || isExporting}
+					disabled={$returnLines.length === 0 || isExporting}
 					class="btn-success flex-1"
 				>
 					{#if isExporting}

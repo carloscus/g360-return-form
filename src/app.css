@@ -32,6 +32,14 @@
 		@apply w-full px-4 py-3 rounded-xl border border-g360-surface/60 dark:border-white/10 bg-white/60 dark:bg-white/5 text-g360-text dark:text-g360-textDark placeholder-g360-muted/60 dark:placeholder-g360-mutedDark/60 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all duration-200 text-base;
 	}
 
+	.glass-input-valid {
+		@apply border-success-400 dark:border-success-500 ring-2 ring-success-400/20 bg-success-50/30 dark:bg-success-900/10;
+	}
+
+	.glass-input-invalid {
+		@apply border-danger-400 dark:border-danger-500 ring-2 ring-danger-400/20 bg-danger-50/30 dark:bg-danger-900/10;
+	}
+
 	.btn-primary {
 		@apply px-4 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 active:scale-[0.97] transition-all duration-100 font-semibold text-base min-h-[48px] flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20;
 	}
@@ -54,38 +62,6 @@
 
 	.badge {
 		@apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
-	}
-
-	.glass-input-valid {
-		@apply border-success-400 dark:border-success-500 ring-2 ring-success-400/20 bg-success-50/30 dark:bg-success-900/10;
-	}
-
-	.glass-input-invalid {
-		@apply border-danger-400 dark:border-danger-500 ring-2 ring-danger-400/20 bg-danger-50/30 dark:bg-danger-900/10;
-	}
-
-	.btn-primary {
-		@apply px-4 py-3.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 active:scale-[0.97] transition-all duration-100 font-semibold text-base min-h-[48px] flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20;
-	}
-
-	.btn-success {
-		@apply px-4 py-3.5 bg-success-600 text-white rounded-xl hover:bg-success-700 active:scale-[0.97] transition-all duration-100 font-semibold text-base min-h-[48px] flex items-center justify-center gap-2 shadow-lg shadow-success-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
-	}
-
-	.btn-danger {
-		@apply px-4 py-3.5 bg-danger-600 text-white rounded-xl hover:bg-danger-700 active:scale-[0.97] transition-all duration-100 font-semibold text-base min-h-[48px] flex items-center justify-center gap-2 shadow-lg shadow-danger-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
-	}
-
-	.btn-secondary {
-		@apply px-4 py-3.5 bg-g360-bg dark:bg-white/10 text-g360-muted dark:text-g360-mutedDark rounded-xl hover:bg-g360-bg/80 dark:hover:bg-white/15 active:scale-[0.97] transition-all duration-100 font-semibold text-base min-h-[48px] flex items-center justify-center gap-2;
-	}
-
-	.btn-ghost {
-		@apply px-3 py-2.5 text-g360-muted dark:text-g360-mutedDark hover:bg-g360-bg dark:hover:bg-white/10 active:bg-g360-bg/80 dark:active:bg-white/15 rounded-xl transition-all duration-100 min-h-[44px] min-w-[44px] flex items-center justify-center gap-2;
-	}
-
-	.badge {
-		@apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold;
 	}
 
 	.badge-primary {

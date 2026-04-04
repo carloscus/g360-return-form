@@ -169,10 +169,6 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 	totalRow.getCell(6).alignment = { horizontal: 'center' };
 	totalRow.getCell(7).numFmt = '#,##0.000';
 
-	detalleSheet.columns = [
-		{ width: 5 }, { width: 12 }, { width: 14 }, { width: 18 },
-		{ width: 35 }, { width: 12 }, { width: 14 }, { width: 14 }, { width: 40 }, { width: 16 }
-	];
 	autoFitColumns(detalleSheet, {
 		0: 5, 1: 10, 2: 14, 3: 15, 4: 35,
 		5: 10, 6: 12, 7: 12, 8: 40, 9: 8
@@ -272,10 +268,6 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 	resTotalRow.getCell(5).alignment = { horizontal: 'center' };
 	resTotalRow.getCell(6).numFmt = '#,##0.000';
 
-	resumenSheet.columns = [
-		{ width: 12 }, { width: 14 }, { width: 18 },
-		{ width: 35 }, { width: 16 }, { width: 16 }, { width: 14 }, { width: 50 }
-	];
 	autoFitColumns(resumenSheet, {
 		0: 10, 1: 14, 2: 15, 3: 35,
 		4: 12, 5: 12, 6: 10, 7: 40

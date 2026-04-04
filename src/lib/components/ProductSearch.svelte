@@ -14,8 +14,6 @@
 	let isSearching = false;
 	let searchInput;
 
-	$: productList = $productos;
-
 	function handleSearch(e) {
 		searchQuery = e.target.value;
 		isSearching = searchQuery.trim().length > 0;
@@ -29,7 +27,7 @@
 		}
 
 		timeout = setTimeout(() => {
-			searchResults = filterProducts(searchQuery, productList);
+			searchResults = filterProducts(searchQuery, $productos);
 			showResults = searchResults.length > 0;
 			showNoResults = searchResults.length === 0;
 			isSearching = false;
@@ -48,7 +46,7 @@
 		const code = searchQuery.trim();
 		if (!code) return;
 
-		const producto = productList.find(p => p.codigo === code);
+		const producto = $productos.find(p => p.codigo === code);
 		if (producto) {
 			selectProduct(producto);
 		} else {

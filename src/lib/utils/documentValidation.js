@@ -44,10 +44,3 @@ export function validarDocumento(documento) {
 
 	return { valid: false, type: null, message: 'Debe tener 8 dígitos (DNI) o 11 dígitos (RUC)' };
 }
-
-export function getTipoDocumento(documento) {
-	const clean = documento.replace(/\D/g, '');
-	if (clean.length === 8) return 'DNI';
-	if (clean.length === 11) return 'RUC';
-	return null;
-}

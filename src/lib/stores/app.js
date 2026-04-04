@@ -1,10 +1,12 @@
-import { writable, derived } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 function getTodayDate() {
 	return typeof window !== 'undefined'
 		? new Date().toISOString().split('T')[0]
 		: '';
 }
+
+const codigoAlmacenDefault = 'VES';
 
 export const clientData = writable({
 	ruc: '',
@@ -15,8 +17,6 @@ export const clientData = writable({
 });
 
 export const returnLines = writable([]);
-export const codigoAlmacenDefault = 'VES';
-export const capturedImage = writable(null);
 
 export function updateClientField(field, value) {
 	clientData.update(data => ({ ...data, [field]: value }));
@@ -65,16 +65,4 @@ export function clearAll() {
 		vendedor: ''
 	});
 	returnLines.set([]);
-	capturedImage.set(null);
 }
-
-export const dashboard = derived(returnLines, lines => {
-	const uniqueLines = lines.length;
-	const totalUnits = lines.reduce((sum, l) => sum + (l.cantidad || 0), 0);
-	const categories = new Set(lines.filter(l => l.categoria).map(l => l.categoria));
-	const totalCategories = categories.size;
-	const totalWeight = lines.reduce((sum, l) => sum + ((l.cantidad || 0) * (l.peso_kg || 0)), 0);
-	const uniqueSkus = new Set(lines.map(l => l.codigo)).size;
-
-	return { uniqueLines, totalUnits, totalCategories, totalWeight, uniqueSkus };
-});

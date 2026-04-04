@@ -5,9 +5,7 @@
 		clientData,
 		returnLines,
 		clearAll,
-		addReturnLine,
-		updateLineField,
-		removeReturnLine
+		addReturnLine
 	} from '$lib/stores/app';
 	import { editingLineId, cameFromResumen } from '$lib/stores/ui';
 	import { loadProductos } from '$lib/stores/products';
@@ -26,7 +24,6 @@
 
 	let showManualModal = false;
 	let showConfirmModal = false;
-	let showProductsModal = false;
 	let showQuickAdd = false;
 	let showEditReturnModal = false;
 	let quickAddProduct = null;
@@ -55,7 +52,6 @@
 	}
 
 	$: editingLine = $editingLineId ? $returnLines.find(l => l.id === $editingLineId) : null;
-	$: totalUnits = $returnLines.reduce((s, l) => s + (l.cantidad || 0), 0);
 
 	function goToSummary() {
 		if ($returnLines.length === 0) {
@@ -80,13 +76,11 @@
 			warning(`${linesWithoutQty.length} línea(s) sin cantidad`);
 			return;
 		}
-		showProductsModal = false;
 		goto('/resumen');
 	}
 
 	function requestClear() {
 		if ($returnLines.length === 0) return;
-		showProductsModal = false;
 		showConfirmModal = true;
 	}
 
@@ -120,7 +114,6 @@
 
 	function startEdit(id) {
 		editingLineId.set(id);
-		showProductsModal = false;
 	}
 
 	function finishEdit() {
@@ -142,10 +135,6 @@
 		editingLineId.set(null);
 		cameFromResumen.set(false);
 		showEditReturnModal = false;
-	}
-
-	function openProductsModal() {
-		showProductsModal = true;
 	}
 
 	function openQuickAdd(product) {
@@ -281,91 +270,6 @@
 		</main>
 	{/if}
 
-	<!-- Products modal -->
-	{#if showProductsModal}
-		<div
-			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
-			on:click={(e) => e.target === e.currentTarget && (showProductsModal = false)}
-			on:keydown={(e) => e.key === 'Escape' && (showProductsModal = false)}
-			role="dialog"
-			aria-modal="true"
-			tabindex="-1"
-		>
-			<div class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp max-h-[80vh] overflow-y-auto">
-				<div class="p-4 sm:p-5">
-					<div class="flex items-center justify-between mb-4">
-						<h3 class="text-base font-bold text-g360-text dark:text-g360-textDark">
-							Productos en gestión
-						</h3>
-						<button
-							on:click={() => showProductsModal = false}
-							class="p-2 text-g360-muted hover:text-g360-text dark:hover:text-g360-textDark rounded-xl hover:bg-g360-bg dark:hover:bg-white/10 transition-all"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-							</svg>
-						</button>
-					</div>
-
-					<div class="flex items-center gap-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl mb-3">
-						<div class="flex-1 text-center">
-							<p class="text-xl font-bold text-primary-600 dark:text-primary-400">{$returnLines.length}</p>
-							<p class="text-[10px] uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold">Líneas</p>
-						</div>
-						<div class="w-px h-8 bg-primary-200 dark:bg-primary-800"></div>
-						<div class="flex-1 text-center">
-							<p class="text-xl font-bold text-g360-text dark:text-g360-textDark">{totalUnits}</p>
-							<p class="text-[10px] uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold">Unidades</p>
-						</div>
-					</div>
-
-					<div class="space-y-2 mb-4">
-						{#each $returnLines as line (line.id)}
-							<button
-								on:click={() => startEdit(line.id)}
-								class="w-full flex items-center gap-3 p-3 bg-g360-bg dark:bg-white/5 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/10 active:scale-[0.98] transition-all text-left"
-							>
-								<div class="flex-1 min-w-0">
-									<div class="flex items-center gap-2">
-										<span class="font-mono text-xs font-bold text-primary-600 dark:text-primary-400">{line.codigo}</span>
-										<span class="text-sm text-g360-text dark:text-g360-textDark truncate">{line.nombre_corto || line.nombre}</span>
-									</div>
-									<div class="flex items-center gap-2 mt-0.5 text-xs text-g360-muted dark:text-g360-mutedDark">
-										<span>Cant: {line.cantidad || 0}</span>
-										{#if line.foto}<span>📷</span>{/if}
-									</div>
-								</div>
-								<svg class="w-4 h-4 text-g360-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-								</svg>
-							</button>
-						{/each}
-					</div>
-
-					<div class="flex gap-3">
-						<button
-							on:click={requestClear}
-							class="btn-danger"
-						>
-							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-							</svg>
-							Limpiar
-						</button>
-						<button
-							on:click={goToSummary}
-							class="btn-success flex-1"
-						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-							</svg>
-							Continuar
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
 
 	{#if showManualModal}
 		<div

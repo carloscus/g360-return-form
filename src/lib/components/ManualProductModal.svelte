@@ -12,17 +12,8 @@
 	let observacion = '';
 	let visible = false;
 
-	export function open() {
+	$: if (visible) {
 		codigo = initialCodigo;
-		nombre = '';
-		ean = '';
-		precio = '';
-		observacion = '';
-		visible = true;
-	}
-
-	export function close() {
-		visible = false;
 	}
 
 	function confirm() {
