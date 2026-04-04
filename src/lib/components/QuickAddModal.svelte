@@ -189,10 +189,9 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
 						</svg>
 						{foto ? 'Cambiar foto' : 'Foto (opcional)'}
-						<input
+<input
 							type="file"
 							accept="image/*"
-							capture="environment"
 							on:change={handlePhotoCapture}
 							class="hidden"
 						/>
