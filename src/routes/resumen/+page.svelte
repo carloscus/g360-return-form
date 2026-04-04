@@ -7,12 +7,12 @@
 		returnLines,
 		clearAll
 	} from '$lib/stores/app';
-	import { editingLineId } from '$lib/stores/ui';
+	import { editingLineId, cameFromResumen } from '$lib/stores/ui';
 	import { success, error, warning } from '$lib/stores/toasts.js';
 	import { saveState, clearState } from '$lib/db/indexedDB';
 
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import ReturnCard from '$lib/components/ReturnCard.svelte';
+	import G360Signature from '$lib/components/G360Signature.svelte';
 
 	let isExporting = false;
 
@@ -24,6 +24,7 @@
 		const un_bx = l.un_bx || 1;
 		return s + Math.ceil((l.cantidad || 0) / un_bx);
 	}, 0);
+	$: categories = [...new Set($returnLines.filter(l => l.categoria).map(l => l.categoria))];
 
 	$: skuSummary = (() => {
 		const groups = {};
@@ -52,9 +53,14 @@
 		return Object.values(groups);
 	})();
 
-	function startEdit(id) {
+	function editLine(id) {
 		editingLineId.set(id);
+		cameFromResumen.set(true);
 		goto('/');
+	}
+
+	function removeLine(id) {
+		returnLines.update(lines => lines.filter(l => l.id !== id));
 	}
 
 	function goBack() {
@@ -146,27 +152,35 @@
 					<p class="text-xs uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold mt-0.5">Líneas</p>
 				</div>
 				<div class="text-center px-3">
-					<p class="text-xl font-bold text-g360-text dark:text-g360-textDark">{totalUnits}</p>
+					<p class="text-xl font-bold text-success-600 dark:text-success-400">{totalUnits}</p>
 					<p class="text-xs uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold mt-0.5">Uds</p>
 				</div>
 				<div class="text-center px-3">
-					<p class="text-xl font-bold text-g360-text dark:text-g360-textDark">{totalBoxes}~</p>
+					<p class="text-xl font-bold text-warning-600 dark:text-warning-400">{totalBoxes}~</p>
 					<p class="text-xs uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold mt-0.5">Cajas</p>
 				</div>
 				<div class="text-center px-3">
-					<p class="text-xl font-bold text-g360-text dark:text-g360-textDark">{totalWeight.toFixed(0)}</p>
+					<p class="text-xl font-bold text-g360-accent dark:text-g360-accentDark">{totalWeight.toFixed(0)}</p>
 					<p class="text-xs uppercase tracking-wider text-g360-muted dark:text-g360-mutedDark font-semibold mt-0.5">Kg</p>
 				</div>
 			</div>
 		</div>
 
+		<!-- Categories -->
+		{#if categories.length > 0}
+			<div class="flex items-center gap-2 mb-4 animate-fadeIn" style="animation-delay: 0.1s">
+				<span class="text-xs font-semibold text-g360-muted dark:text-g360-mutedDark">Categorías:</span>
+				{#each categories as cat}
+					<span class="badge bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 text-[10px]">{cat}</span>
+				{/each}
+			</div>
+		{/if}
+
 		<!-- SKU Summary -->
-		<div class="space-y-1.5 mb-4 animate-fadeIn">
-			<h2 class="text-sm font-semibold text-g360-text dark:text-g360-textDark">
-				{uniqueSkuCount} SKU · {$returnLines.length} registro{$returnLines.length !== 1 ? 's' : ''}
-			</h2>
-			{#each skuSummary as sku}
-				<div class="glass-card p-2">
+		<div class="space-y-1.5 mb-4 animate-fadeIn" style="animation-delay: 0.2s">
+			<h2 class="text-sm font-semibold text-g360-text dark:text-g360-textDark">Resumen por SKU</h2>
+			{#each skuSummary as sku, i}
+				<div class="glass-card p-2 animate-slideUp" style="animation-delay: {0.05 * i}s; animation-fill-mode: both;">
 					<div class="flex items-center gap-2 mb-1.5">
 						<span class="font-mono text-xs font-bold text-primary-600 dark:text-primary-400">{sku.codigo}</span>
 						{#if sku.linea}
@@ -212,12 +226,52 @@
 			{/each}
 		</div>
 
-		<!-- Products List -->
-		<section class="space-y-4 mb-6">
-			{#each $returnLines as line (line.id)}
-				<ReturnCard {line} on:edit={() => startEdit(line.id)} />
+		<!-- Individual Lines -->
+		<div class="space-y-2 mb-4 animate-fadeIn" style="animation-delay: 0.3s">
+			<h2 class="text-sm font-semibold text-g360-text dark:text-g360-textDark">SKU — Registros</h2>
+			{#each $returnLines as line, i (line.id)}
+				<div class="glass-card p-3 animate-slideUp" style="animation-delay: {0.05 * i}s; animation-fill-mode: both;">
+					<div class="flex items-start justify-between mb-2">
+						<div class="flex-1 min-w-0">
+							<div class="flex items-center gap-2 flex-wrap">
+								<span class="font-mono text-xs font-bold text-primary-600 dark:text-primary-400">{line.codigo}</span>
+								{#if line.linea}
+									<span class="badge badge-primary text-[10px]">{line.linea}</span>
+								{/if}
+							</div>
+							<p class="text-xs text-g360-text dark:text-g360-textDark truncate mt-0.5">{line.nombre_corto || line.nombre}</p>
+						</div>
+						<div class="flex items-center gap-1 flex-shrink-0 ml-2">
+							<button
+								on:click={() => editLine(line.id)}
+								class="p-1.5 text-g360-muted hover:text-primary-500 active:bg-primary-50 dark:active:bg-primary-900/20 rounded-lg transition-all"
+								aria-label="Editar"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+								</svg>
+							</button>
+							<button
+								on:click={() => removeLine(line.id)}
+								class="p-1.5 text-g360-muted hover:text-danger-500 active:bg-danger-50 dark:active:bg-danger-900/20 rounded-lg transition-all"
+								aria-label="Eliminar"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div class="flex items-center gap-3 text-xs text-g360-muted dark:text-g360-mutedDark">
+						<span class="font-bold text-g360-text dark:text-g360-textDark">{line.cantidad} uds</span>
+						{#if line.observacion}
+							<span>·</span>
+							<span class="truncate">{line.observacion}</span>
+						{/if}
+					</div>
+				</div>
 			{/each}
-		</section>
+		</div>
 
 		<!-- Actions -->
 		<div class="flex flex-col sm:flex-row gap-3">
@@ -249,4 +303,5 @@
 			</button>
 		</div>
 	</main>
+	<G360Signature cliente="CIPSA" />
 </div>
