@@ -15,6 +15,7 @@
 	import G360Signature from '$lib/components/G360Signature.svelte';
 
 	let isExporting = false;
+	let showConfirmFinalize = false;
 
 	$: uniqueSkuCount = [...new Set($returnLines.map(l => l.codigo))].length;
 	$: uniqueLineas = [...new Set($returnLines.filter(l => l.linea).map(l => l.linea))].length;
@@ -92,11 +93,12 @@
 		try {
 			await clearState();
 			clearAll();
-			success('Devolución finalizada correctamente');
+			success('Registro cerrado correctamente');
+			showConfirmFinalize = false;
 			goto('/');
 		} catch (err) {
-			console.error('Error finalizando:', err);
-			error('Error al finalizar la devolución');
+			console.error('Error cerrando:', err);
+			error('Error al cerrar el registro');
 		}
 	}
 
@@ -310,15 +312,39 @@
 				Exportar Excel
 			</button>
 			<button
-				on:click={finalizeReturn}
-				class="btn-primary flex-1"
+				on:click={() => showConfirmFinalize = true}
+				class="btn-danger flex-1"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 				</svg>
-				Finalizar Devolución
+				Cerrar Registro
 			</button>
 		</div>
 	</main>
+
+	<!-- Confirm finalize modal -->
+	{#if showConfirmFinalize}
+		<div
+			class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			on:click={(e) => e.target === e.currentTarget && (showConfirmFinalize = false)}
+			on:keydown={(e) => e.key === 'Escape' && (showConfirmFinalize = false)}
+			role="alertdialog"
+			aria-modal="true"
+			tabindex="-1"
+		>
+			<div class="bg-white dark:bg-g360-surfaceDark rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-scaleIn">
+				<h3 class="text-base font-bold text-g360-text dark:text-g360-textDark mb-2">Cerrar registro</h3>
+				<p class="text-sm text-g360-muted dark:text-g360-mutedDark mb-6">
+					¿Está seguro de cerrar este registro? Se limpiarán todos los datos del formulario.
+				</p>
+				<div class="flex gap-3">
+					<button on:click={() => showConfirmFinalize = false} class="btn-secondary flex-1">Cancelar</button>
+					<button on:click={finalizeReturn} class="btn-danger flex-1">Confirmar</button>
+				</div>
+			</div>
+		</div>
+	{/if}
+
 	<G360Signature cliente="CIPSA" />
 </div>
