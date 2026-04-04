@@ -102,11 +102,11 @@
 		}
 	}
 
-	onMount(async () => {
-		if ($returnLines.length === 0) {
-			warning('No hay productos para devolver');
-			goto('/');
-		}
+onMount(async () => {
+		// if ($returnLines.length === 0) {
+		// 	warning('No hay productos para devolver');
+		// 	goto('/');
+		// }
 	});
 </script>
 
