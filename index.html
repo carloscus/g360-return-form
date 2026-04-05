@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="theme-color" content="#008f5d" />
+		<link rel="manifest" href="/g360-return-form/manifest.json" />
+		<link rel="apple-touch-icon" href="/g360-return-form/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/g360-return-form/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/g360-return-form/favicon-16x16.png" />
+		<link rel="icon" href="/g360-return-form/favicon.svg" />
+		<script>
+			(function() {
+				var theme = localStorage.getItem('theme');
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
+			})();
+		</script>
+		<link href="/g360-return-form/_app/immutable/entry/start.B1jO8-JM.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/BzdXOJql.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/WgKW69MF.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/C6QO9rUa.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/entry/app.BPZuRCOc.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/C1FmrZbK.js" rel="modulepreload">
+		<link href="/g360-return-form/_app/immutable/chunks/CBSO4DQM.js" rel="modulepreload">
+		
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div class="contents">
+			<script>
+				{
+					__sveltekit_1kxc5wz = {
+						base: "/g360-return-form",
+						assets: "/g360-return-form"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/g360-return-form/_app/immutable/entry/start.B1jO8-JM.js"),
+						import("/g360-return-form/_app/immutable/entry/app.BPZuRCOc.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
