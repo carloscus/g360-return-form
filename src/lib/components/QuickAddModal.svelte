@@ -252,6 +252,7 @@
 						<input
 							type="file"
 							accept="image/*"
+							capture="environment"
 							on:change={handlePhotoCapture}
 							class="hidden"
 						/>
