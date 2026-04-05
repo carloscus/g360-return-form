@@ -121,8 +121,8 @@
 
 <!-- Meta SEO para esta vista -->
 <svelte:head>
-	<title>Resumen de Devolución — CIPSA</title>
-	<meta name="description" content="Resumen y exportación de devoluciones de productos CIPSA" />
+	<title>Devoluciones - CIPSA</title>
+	<meta name="description" content="Gestión de devoluciones de productos CIPSA" />
 </svelte:head>
 
 <!-- Panel de totales: líneas, unidades, cajas y peso -->

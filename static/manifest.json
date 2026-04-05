@@ -1,6 +1,6 @@
 {
-  "name": "CIPSA Devolución de Productos",
-  "short_name": "CIPSA Devolución",
+  "name": "Devoluciones - CIPSA",
+  "short_name": "CIPSA Dev",
   "description": "Sistema de gestión de devoluciones para CIPSA",
   "start_url": "/g360-return-form/",
   "scope": "/g360-return-form/",
