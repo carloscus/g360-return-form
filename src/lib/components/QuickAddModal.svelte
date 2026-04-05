@@ -1,18 +1,37 @@
+<!-- ============================================================
+     Componente QuickAddModal — Modal para agregar o editar producto
+     Permite ingresar cantidad, observación y foto opcional.
+     Modo agregar: recibe prop "product"
+     Modo edición: recibe prop "editLine" con datos pre-llenados
+     ============================================================ -->
 <script>
 	import { createEventDispatcher } from 'svelte';
 	import { error, success } from '$lib/stores/toasts.js';
 
 	const dispatch = createEventDispatcher();
 
+	// ---- Props ----
+	/** Producto del catálogo (modo agregar) */
 	export let product = null;
+	/** Controla visibilidad del modal */
 	export let isOpen = false;
+	/** Línea existente a editar (modo edición) */
+	export let editLine = null;
 
+	// ---- Estado interno del formulario ----
 	let cantidad = 1;
 	let observacion = '';
 	let foto = null;
 	let cantidadInput;
 	let initialized = false;
 
+	// Determina si estamos en modo edición
+	$: isEditing = !!editLine;
+
+	/**
+	 * Inicializa el formulario con valores por defecto al agregar un producto nuevo.
+	 * Se ejecuta solo una vez por apertura del modal.
+	 */
 	$: if (product && isOpen && !initialized) {
 		cantidad = 1;
 		observacion = '';
@@ -20,22 +39,42 @@
 		initialized = true;
 	}
 
+	/**
+	 * Inicializa el formulario con los datos existentes de la línea a editar.
+	 * Se ejecuta solo una vez por apertura del modal.
+	 */
+	$: if (editLine && isOpen && !initialized) {
+		cantidad = editLine.cantidad || 1;
+		observacion = editLine.observacion || '';
+		foto = editLine.foto || null;
+		initialized = true;
+	}
+
+	// Resetea el flag de inicialización al cerrar el modal
 	$: if (!isOpen) {
 		initialized = false;
 	}
 
+	// Validación: cantidad positiva y observación no vacía
 	$: isValid = cantidad > 0 && observacion.trim().length > 0;
 
+	/** Cierra el modal y notifica al padre */
 	function close() {
 		isOpen = false;
+		dispatch('close');
 	}
 
+	/** Selecciona todo el texto del campo cantidad al enfocar */
 	function selectAll() {
 		if (cantidadInput) {
 			setTimeout(() => cantidadInput.select(), 50);
 		}
 	}
 
+	/**
+	 * Procesa la imagen seleccionada por el usuario.
+	 * Valida tipo y tamaño (máx 10MB), convierte a base64.
+	 */
 	function handlePhotoCapture(e) {
 		const file = e.target.files[0];
 		if (!file) return;
@@ -57,36 +96,56 @@
 		};
 		reader.onerror = () => error('Error al leer la imagen');
 		reader.readAsDataURL(file);
+		// Limpia el input para permitir re-subir el mismo archivo
 		e.target.value = '';
 	}
 
+	/** Elimina la foto adjunta */
 	function removePhoto() {
 		foto = null;
 	}
 
+	/**
+	 * Confirma y emite el evento correspondiente:
+	 * - 'confirm' para agregar nuevo producto
+	 * - 'update' para editar línea existente
+	 */
 	function confirm() {
 		if (!isValid) return;
 
-		dispatch('confirm', {
-			product,
-			cantidad: cantidad,
-			observacion: observacion.trim(),
-			foto
-		});
+		if (isEditing) {
+			dispatch('update', {
+				lineId: editLine.id,
+				cantidad: cantidad,
+				observacion: observacion.trim(),
+				foto
+			});
+		} else {
+			dispatch('confirm', {
+				product,
+				cantidad: cantidad,
+				observacion: observacion.trim(),
+				foto
+			});
+		}
 
 		isOpen = false;
+		editLine = null;
 	}
 
+	/** Cierra el modal con tecla Escape */
 	function handleKeydown(e) {
 		if (e.key === 'Escape') close();
 	}
 
+	/** Cierra el modal al hacer clic fuera del contenido */
 	function handleClickOutside(e) {
 		if (e.target === e.currentTarget) close();
 	}
 </script>
 
-{#if isOpen && product}
+{#if isOpen && (product || editLine)}
+	<!-- Overlay del modal -->
 	<div
 		class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
 		on:click={handleClickOutside}
@@ -94,24 +153,25 @@
 		role="dialog"
 		aria-modal="true"
 	>
+		<!-- Contenido del modal -->
 		<div
 			class="bg-white dark:bg-g360-surfaceDark w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl animate-slideUp sm:animate-scaleIn max-h-[90vh] overflow-y-auto"
 			on:click|stopPropagation
 			on:touchstart|stopPropagation
 		>
 			<div class="p-5 sm:p-6">
-				<!-- Product header -->
+				<!-- Encabezado del producto -->
 				<div class="flex items-start justify-between mb-4">
 					<div class="flex-1 min-w-0 mr-3">
 						<div class="flex items-center gap-2 mb-1">
-							<span class="font-mono text-sm font-bold text-primary-600 dark:text-primary-400">{product.codigo}</span>
-							{#if product.linea}
-								<span class="badge badge-primary text-[10px]">{product.linea}</span>
+							<span class="font-mono text-sm font-bold text-primary-600 dark:text-primary-400">{(editLine || product).codigo}</span>
+							{#if (editLine || product).linea}
+								<span class="badge badge-primary text-[10px]">{(editLine || product).linea}</span>
 							{/if}
 						</div>
-						<p class="text-sm text-g360-text dark:text-g360-textDark truncate">{product.nombre_corto || product.nombre}</p>
-						{#if product.ean}
-							<p class="text-xs text-g360-muted dark:text-g360-mutedDark font-mono mt-0.5">EAN: {product.ean}</p>
+						<p class="text-sm text-g360-text dark:text-g360-textDark truncate">{(editLine || product).nombre_corto || (editLine || product).nombre}</p>
+						{#if (editLine || product).ean}
+							<p class="text-xs text-g360-muted dark:text-g360-mutedDark font-mono mt-0.5">EAN: {(editLine || product).ean}</p>
 						{/if}
 					</div>
 					<button
@@ -125,7 +185,7 @@
 					</button>
 				</div>
 
-				<!-- Quantity -->
+				<!-- Campo de cantidad con botones +/- -->
 				<div class="input-group mb-4">
 					<label for="quick-cantidad" class="input-label">Cantidad <span class="text-danger-500">*</span></label>
 					<div class="flex items-center gap-2">
@@ -157,7 +217,7 @@
 					</div>
 				</div>
 
-				<!-- Observation -->
+				<!-- Campo de observación -->
 				<div class="input-group mb-4">
 					<label for="quick-obs" class="input-label">Observación <span class="text-danger-500">*</span></label>
 					<textarea
@@ -169,7 +229,7 @@
 					></textarea>
 				</div>
 
-				<!-- Photo: optional -->
+				<!-- Selector de foto (opcional) -->
 				<div class="flex items-center gap-2 mb-5">
 					{#if foto}
 						<div class="relative flex-shrink-0">
@@ -189,7 +249,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
 						</svg>
 						{foto ? 'Cambiar foto' : 'Foto (opcional)'}
-<input
+						<input
 							type="file"
 							accept="image/*"
 							on:change={handlePhotoCapture}
@@ -198,7 +258,7 @@
 					</label>
 				</div>
 
-				<!-- Actions -->
+				<!-- Botones de acción -->
 				<div class="flex gap-3">
 					<button
 						on:click={close}
@@ -214,7 +274,7 @@
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 						</svg>
-						Agregar a la lista
+						{isEditing ? 'Guardar cambios' : 'Agregar a la lista'}
 					</button>
 				</div>
 			</div>

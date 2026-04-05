@@ -1,8 +1,10 @@
 <script>
 	import { onDestroy } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { createEventDispatcher } from 'svelte';
 	import { returnLines } from '$lib/stores/app';
 	import { warning } from '$lib/stores/toasts.js';
+
+	const dispatch = createEventDispatcher();
 
 	let totalUnits = 0;
 	const unsubReturnLines = returnLines.subscribe(lines => {
@@ -42,7 +44,7 @@
 		document.removeEventListener('pointermove', onPointerMove);
 		document.removeEventListener('pointerup', onPointerUp);
 		if (!isDragging && $returnLines.length > 0) {
-			goto('/resumen');
+			dispatch('goToSummary');
 		} else if (!isDragging) {
 			warning('Agregue al menos un producto');
 		}
@@ -58,7 +60,7 @@
 		tabindex="0"
 		role="button"
 		aria-label="Ir al resumen. {$returnLines.length} productos, {totalUnits} unidades"
-		on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if ($returnLines.length > 0) goto('/resumen'); else warning('Agregue al menos un producto'); } }}
+		on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if ($returnLines.length > 0) dispatch('goToSummary'); else warning('Agregue al menos un producto'); } }}
 	>
 		<div class="flex items-center px-5 py-3 rounded-2xl bg-success-50/95 dark:bg-g360-surfaceDark/50 backdrop-blur-md border-2 border-success-600/35 dark:border-white/10 shadow-lg transition-all">
 			<div class="flex items-center gap-1.5">

@@ -132,18 +132,33 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 				const buffer = b64ToBuffer(line.foto);
 				const currentRow = detalleSheet.rowCount;
 
-				// Get image dimensions
-				const img = new Image();
-				img.src = line.foto;
-				const imgWidth = img.naturalWidth || 400;
-				const imgHeight = img.naturalHeight || 300;
+				// Decode base64 to get raw image dimensions reliably
+				const imgData = line.foto.split(',')[1];
+				const byteChars = atob(imgData);
+				const headerBytes = byteChars.substring(0, 30);
+
+				let imgWidth = 400;
+				let imgHeight = 300;
+
+				if (ext === 'jpeg' || ext === 'jpg') {
+					for (let i = 0; i < headerBytes.length - 4; i++) {
+						if (headerBytes.charCodeAt(i) === 0xFF && headerBytes.charCodeAt(i + 1) === 0xC0) {
+							imgHeight = headerBytes.charCodeAt(i + 5) * 256 + headerBytes.charCodeAt(i + 6);
+							imgWidth = headerBytes.charCodeAt(i + 7) * 256 + headerBytes.charCodeAt(i + 8);
+							break;
+						}
+					}
+				} else if (ext === 'png') {
+					imgWidth = headerBytes.charCodeAt(16) * 256 + headerBytes.charCodeAt(17);
+					imgHeight = headerBytes.charCodeAt(20) * 256 + headerBytes.charCodeAt(21);
+				}
+
 				const ratio = imgHeight / imgWidth;
-
-				const cellWidthPx = 110;
+				const cellWidthPx = 100;
 				const cellHeightPx = Math.round(cellWidthPx * ratio);
-				const rowHeightNeeded = Math.max(cellHeightPx, 60);
+				const rowHeightPt = Math.max(cellHeightPx * 0.75, 50);
 
-				row.height = rowHeightNeeded * 0.75;
+				row.height = rowHeightPt;
 
 				const imageId = workbook.addImage({
 					buffer,
@@ -151,9 +166,10 @@ export async function generateDevolucionExcel(clientData, returnLines) {
 					name: `evidencia_${line.codigo}_${i + 1}`
 				});
 
+				// Column J = index 9 (0-based). Place image anchored to the cell.
 				detalleSheet.addImage(imageId, {
-					tl: { col: 9.1, row: currentRow - 0.85 },
-					br: { col: 9.95, row: currentRow + 0.15 },
+					tl: { col: 9, row: currentRow - 1 },
+					br: { col: 10, row: currentRow },
 					editAs: 'oneCell'
 				});
 			} catch (err) {

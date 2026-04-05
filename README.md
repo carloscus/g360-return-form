@@ -16,7 +16,7 @@ Aplicación web progresiva (PWA) para registrar devoluciones de productos en cam
 
 ### Gestión de Líneas
 - **Múltiples registros por SKU** — el mismo producto puede agregarse varias veces con distintas observaciones (ej: "mal empaque", "cajas abiertas")
-- **Edición individual** — cada línea se edita por separado con cantidad, observación y foto
+- **Edición individual** — cada línea se edita con el mismo QuickAdd Modal pre-llenado con los datos existentes
 - **Validación obligatoria** — no se puede avanzar al resumen sin observación y cantidad en cada línea
 
 ### Resumen
@@ -35,15 +35,16 @@ Aplicación web progresiva (PWA) para registrar devoluciones de productos en cam
 - **Auto-guardado** — IndexedDB guarda automáticamente el estado (cliente + líneas) al cambiar
 - **Restauración** — al volver a la app, recupera el estado anterior
 - **Modo oscuro** — toggle con persistencia en localStorage, detección automática del tema del sistema
-- **Pill flotante draggable** — indicador arrastrable en esquina inferior izquierda que muestra productos y unidades, lleva al resumen al tocarlo
+- **Pill flotante draggable** — indicador arrastrable que muestra productos y unidades, lleva al resumen al tocarlo
 - **Confirmaciones** — tanto "Cerrar Registro" como "Limpiar todo" requieren confirmación explícita
 
 ## Flujo de Usuario
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  PÁGINA 1 — Formulario de Devolución                    │
+│  APP — Single Page con dos pasos (form ↔ summary)       │
 │                                                         │
+│  PASO 1 — Formulario de Devolución                      │
 │  1. Ingresar RUC/DNI + Vendedor (obligatorios)          │
 │  2. Buscar producto (SKU, nombre, EAN, línea)           │
 │  3. Seleccionar → QuickAdd Modal                        │
@@ -53,14 +54,10 @@ Aplicación web progresiva (PWA) para registrar devoluciones de productos en cam
 │                                                         │
 │  Accesos:                                               │
 │  • Pill flotante → ir al resumen                        │
-│  • Botón "Continuar" → ir al resumen (valida todo)      │
+│  • Validación automática al intentar ir al resumen      │
 │  • Botón limpiar → confirmación → borra todo            │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│  PÁGINA 2 — Resumen                                     │
 │                                                         │
+│  PASO 2 — Resumen                                       │
 │  • Dashboard: Líneas · Uds · Cajas · Kg                 │
 │  • Categorías: badges de categorías presentes           │
 │  • Resumen por SKU: agrupado con totales                │
@@ -69,21 +66,20 @@ Aplicación web progresiva (PWA) para registrar devoluciones de productos en cam
 │  Acciones:                                              │
 │  • Exportar Excel → descarga .xlsx                      │
 │  • Cerrar Registro → confirmación → limpia y vuelve     │
-│  • Volver → página 1 (búsqueda normal)                  │
-│  • Editar línea → página 1 en modo edición              │
+│  • Volver → paso 1 (búsqueda normal)                    │
+│  • Editar línea → abre QuickAdd Modal con datos         │
+│    pre-llenados, al guardar vuelve al resumen           │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ### Flujo de Edición desde Resumen
 
 ```
-Resumen → Editar línea → Página 1 (modo edición)
+Resumen → Editar línea → QuickAdd Modal (datos pre-llenados)
     ↓
-Editar cantidad/observación/foto → "Volver"
+Cambiar cantidad/observación/foto → "Guardar cambios"
     ↓
-Modal: "¿A dónde desea ir?"
-    ├─ Seguir agregando → Página 1 (búsqueda normal)
-    └─ Ir al resumen → Resumen
+Modal se cierra → vuelve al resumen automáticamente
 ```
 
 ## Stack
@@ -137,26 +133,23 @@ npm run preview
 ```
 src/
 ├── routes/
-│   ├── +page.svelte          # Página principal — formulario de devolución
+│   ├── +page.svelte          # Página principal — formulario + resumen (step-based)
 │   ├── +layout.svelte        # Layout global con slot
-│   ├── +layout.js            # Prerender: false (SPA)
-│   └── resumen/
-│       └── +page.svelte      # Página de resumen + exportación Excel
+│   └── +layout.js            # Prerender: false (SPA)
 ├── lib/
 │   ├── components/
-│   │   ├── ClientForm.svelte       # Formulario: RUC/DNI, vendedor, fecha, código
-│   │   ├── ProductSearch.svelte    # Búsqueda con debounce y resultados
-│   │   ├── QuickAddModal.svelte    # Modal: cantidad + observación + foto
+│   │   ├── ClientForm.svelte         # Formulario: RUC/DNI, vendedor, fecha, código
+│   │   ├── ProductSearch.svelte      # Búsqueda con debounce y resultados
+│   │   ├── QuickAddModal.svelte      # Modal: cantidad + observación + foto (agregar/editar)
 │   │   ├── ManualProductModal.svelte # Producto manual por código
-│   │   ├── ReturnCard.svelte       # Tarjeta editable (edición de línea)
-│   │   ├── NotificationPill.svelte # Pill flotante draggable
-│   │   ├── ToastContainer.svelte   # Notificaciones toast
-│   │   ├── ThemeToggle.svelte      # Toggle modo claro/oscuro
-│   │   └── G360Signature.svelte    # Sello G360 (ambas páginas)
+│   │   ├── NotificationPill.svelte   # Pill flotante draggable
+│   │   ├── ToastContainer.svelte     # Notificaciones toast
+│   │   ├── ThemeToggle.svelte        # Toggle modo claro/oscuro
+│   │   ├── SummaryView.svelte        # Vista de resumen con dashboard y acciones
+│   │   └── G360Signature.svelte      # Sello G360
 │   ├── stores/
 │   │   ├── app.js              # clientData, returnLines, acciones CRUD
 │   │   ├── products.js         # productos, filterProducts, loadProductos
-│   │   ├── ui.js               # editingLineId, cameFromResumen
 │   │   └── toasts.js           # success, error, warning
 │   ├── db/
 │   │   └── indexedDB.js        # Persistencia local (save/load/clear)
