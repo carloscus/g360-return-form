@@ -5,6 +5,7 @@
 <script>
 	// Ciclo de vida de Svelte
 	import { onMount, onDestroy } from 'svelte';
+	import { base } from '$app/paths';
 
 	// Stores: estado global de la aplicación
 	import {
@@ -240,7 +241,7 @@
 							</svg>
 						</button>
 					{/if}
-					<img src="/logo-cipsa.svg" alt="CIPSA" class="h-8 sm:h-10 w-auto" />
+					<img src="{base}/logo-cipsa.svg" alt="CIPSA" class="h-8 sm:h-10 w-auto" />
 					<div>
 						<h1 class="text-base sm:text-lg font-bold text-g360-text dark:text-g360-textDark">
 							{#if step === 'summary'}
