@@ -104,6 +104,8 @@
 		step = 'summary';
 	}
 
+	$: clientDataValid = $clientData.ruc.trim().length >= 8 && $clientData.vendedor.trim().length > 0;
+
 	// ---- Volver del resumen al formulario ----
 	function goBack() {
 		step = 'form';
@@ -137,6 +139,11 @@
 
 	// ---- Agregar producto manual al listado ----
 	function handleAddManualProduct(e) {
+		if (!clientDataValid) {
+			error('Complete Documento y Vendedor antes de agregar productos');
+			showManualModal = false;
+			return;
+		}
 		const { codigo, nombre, ean, precio } = e.detail;
 		addReturnLine({
 			codigo,
@@ -159,6 +166,10 @@
 
 	// ---- Abrir modal para agregar nuevo producto ----
 	function openQuickAdd(product) {
+		if (!clientDataValid) {
+			error('Complete Documento y Vendedor antes de agregar productos');
+			return;
+		}
 		quickAddProduct = product;
 		showQuickAdd = true;
 	}
@@ -293,7 +304,21 @@
 				</section>
 
 				<section aria-label="Búsqueda de productos" class="mt-4">
-					<ProductSearch onAddManual={() => openManualModal()} on:select={(e) => openQuickAdd(e.detail)} />
+					{#if clientDataValid}
+						<ProductSearch onAddManual={() => openManualModal()} on:select={(e) => openQuickAdd(e.detail)} />
+					{:else}
+						<div class="glass-card p-6 text-center opacity-60">
+							<svg class="w-10 h-10 mx-auto text-g360-muted dark:text-g360-mutedDark mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+							</svg>
+							<p class="text-sm text-g360-muted dark:text-g360-mutedDark mb-1">
+								Complete los datos del cliente
+							</p>
+							<p class="text-xs text-g360-muted/70 dark:text-g360-mutedDark/70">
+								Se requiere Documento (RUC/DNI) y Vendedor para buscar productos
+							</p>
+						</div>
+					{/if}
 				</section>
 			{/if}
 		</main>

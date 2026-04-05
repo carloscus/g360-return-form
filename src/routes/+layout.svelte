@@ -1,5 +1,6 @@
 <script>
 	import '../app.css';
+	import PWAInstallPrompt from '$lib/components/PWAInstallPrompt.svelte';
 
 	export let data;
 </script>
@@ -11,3 +12,5 @@
 <div class="min-h-screen">
 	<slot />
 </div>
+
+<PWAInstallPrompt />
